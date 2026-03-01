@@ -1,13 +1,39 @@
-import { featuredCollections, newInMarket } from "./data/mockData";
+import { supabase, Property, Collection } from "../lib/supabase";
+import Pagination from "./components/Pagination";
 
-export default function Home() {
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
+const PAGE_SIZE = 8;
+
+interface HomeProps {
+  searchParams: Promise<{ page?: string }>;
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+  const params = await searchParams;
+  const currentPage = Math.max(1, parseInt(params.page ?? "1", 10));
+  const offset = (currentPage - 1) * PAGE_SIZE;
+
+  // Fetch paginated properties + total count in parallel with featured collections
+  const [propertiesResult, collectionsResult] = await Promise.all([
+    supabase
+      .from("properties")
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: true })
+      .range(offset, offset + PAGE_SIZE - 1),
+    supabase.from("collections").select("*").order("created_at", { ascending: true }),
+  ]);
+
+  const properties: Property[] = propertiesResult.data ?? [];
+  const totalCount = propertiesResult.count ?? 0;
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+
+  const collections: Collection[] = collectionsResult.data ?? [];
+
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
       maximumFractionDigits: 0,
     }).format(price);
-  };
 
   return (
     <>
@@ -51,6 +77,7 @@ export default function Home() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        {/* Hero / Search */}
         <section className="py-12 md:py-16">
           <div className="max-w-3xl mx-auto text-center space-y-8">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-light text-nordic-dark leading-tight">
@@ -88,6 +115,7 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Featured Collections */}
         <section className="mb-16">
           <div className="flex items-end justify-between mb-8">
             <div>
@@ -100,7 +128,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {featuredCollections.map((collection) => (
+            {collections.map((collection) => (
               <div key={collection.id} className="group relative rounded-xl overflow-hidden shadow-soft bg-white cursor-pointer">
                 <div className="aspect-[4/3] w-full overflow-hidden relative">
                   <img
@@ -143,11 +171,15 @@ export default function Home() {
           </div>
         </section>
 
+        {/* New in Market — paginated */}
         <section>
           <div className="flex items-end justify-between mb-8">
             <div>
               <h2 className="text-2xl font-light text-nordic-dark">New in Market</h2>
-              <p className="text-nordic-muted mt-1 text-sm">Fresh opportunities added this week.</p>
+              <p className="text-nordic-muted mt-1 text-sm">
+                Fresh opportunities added this week.{" "}
+                <span className="text-mosque font-medium">{totalCount} properties</span>
+              </p>
             </div>
             <div className="hidden md:flex bg-white p-1 rounded-lg">
               <button className="px-4 py-1.5 rounded-md text-sm font-medium bg-nordic-dark text-white shadow-sm">All</button>
@@ -155,8 +187,9 @@ export default function Home() {
               <button className="px-4 py-1.5 rounded-md text-sm font-medium text-nordic-muted hover:text-nordic-dark transition-colors">Rent</button>
             </div>
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {newInMarket.map((property) => (
+            {properties.map((property) => (
               <article key={property.id} className="bg-white rounded-xl overflow-hidden shadow-card hover:shadow-soft transition-all duration-300 group cursor-pointer h-full flex flex-col">
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img
@@ -167,7 +200,7 @@ export default function Home() {
                   <button className="absolute top-3 right-3 p-2 bg-white/90 rounded-full hover:bg-mosque hover:text-white transition-colors text-nordic-dark">
                     <span className="material-icons text-lg">favorite_border</span>
                   </button>
-                  <div className={`absolute bottom-3 left-3 text-white text-xs font-bold px-2 py-1 rounded ${property.type === 'rent' ? 'bg-mosque/90' : 'bg-nordic-dark/90'}`}>
+                  <div className={`absolute bottom-3 left-3 text-white text-xs font-bold px-2 py-1 rounded ${property.type === "rent" ? "bg-mosque/90" : "bg-nordic-dark/90"}`}>
                     FOR {property.type.toUpperCase()}
                   </div>
                 </div>
@@ -175,7 +208,7 @@ export default function Home() {
                   <div className="flex justify-between items-baseline mb-2">
                     <h3 className="font-bold text-lg text-nordic-dark">
                       {formatPrice(property.price)}
-                      {property.type === 'rent' && <span className="text-sm font-normal text-nordic-muted">/mo</span>}
+                      {property.type === "rent" && <span className="text-sm font-normal text-nordic-muted">/mo</span>}
                     </h3>
                   </div>
                   <h4 className="text-nordic-dark font-medium truncate mb-1">{property.title}</h4>
@@ -195,11 +228,9 @@ export default function Home() {
               </article>
             ))}
           </div>
-          <div className="mt-12 text-center">
-            <button className="px-8 py-3 bg-white border border-nordic-dark/10 hover:border-mosque hover:text-mosque text-nordic-dark font-medium rounded-lg transition-all hover:shadow-md cursor-pointer">
-              Load more properties
-            </button>
-          </div>
+
+          {/* Server-side pagination */}
+          <Pagination currentPage={currentPage} totalPages={totalPages} />
         </section>
       </main>
     </>

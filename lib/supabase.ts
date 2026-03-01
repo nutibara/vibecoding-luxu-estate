@@ -16,6 +16,7 @@ export interface Property {
     sqft: number;
     type: "sale" | "rent";
     is_new: boolean;
+    is_featured?: boolean;
 }
 
 export interface Collection {

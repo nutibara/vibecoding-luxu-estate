@@ -9,6 +9,7 @@ export interface Property {
   sqft: number;
   type: 'sale' | 'rent';
   isNew?: boolean;
+  isFeatured?: boolean;
 }
 
 export interface Collection {
@@ -63,6 +64,7 @@ export const newInMarket: Property[] = [
     sqft: 120,
     type: 'sale',
     isNew: false,
+    isFeatured: true,
   },
   {
     id: '2',
@@ -141,6 +143,7 @@ export const newInMarket: Property[] = [
     sqft: 250,
     type: 'sale',
     isNew: true,
+    isFeatured: true,
   },
   {
     id: '8',
@@ -206,6 +209,7 @@ export const newInMarket: Property[] = [
     sqft: 350,
     type: 'rent',
     isNew: true,
+    isFeatured: true,
   },
   {
     id: '13',

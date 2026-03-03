@@ -8,6 +8,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export interface Property {
     id: string;
     title: string;
+    slug: string;
     location: string;
     price: number;
     image: string;
@@ -17,6 +18,21 @@ export interface Property {
     type: "sale" | "rent";
     is_new: boolean;
     is_featured?: boolean;
+    description?: string;
+    garage?: number;
+    amenities?: string[];
+    latitude?: number;
+    longitude?: number;
+    agent_name?: string;
+    agent_image?: string;
+}
+
+export interface PropertyImage {
+    id: string;
+    property_id: string;
+    url: string;
+    alt: string;
+    display_order: number;
 }
 
 export interface Collection {

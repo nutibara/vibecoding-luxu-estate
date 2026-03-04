@@ -1,6 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { useLanguage } from "../i18n/LanguageContext";
+import LanguageSelector from "./LanguageSelector";
 
 export default function Navbar() {
+    const { t } = useLanguage();
+
     return (
         <nav className="sticky top-0 z-50 bg-background-light/95 backdrop-blur-md border-b border-nordic-dark/10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,20 +20,21 @@ export default function Navbar() {
                         </span>
                     </Link>
                     <div className="hidden md:flex items-center space-x-8">
-                        <Link className="text-mosque font-medium text-sm border-b-2 border-mosque px-1 py-1" href="/">Buy</Link>
-                        <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="#">Rent</Link>
-                        <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="#">Sell</Link>
-                        <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="#">Saved Homes</Link>
+                        <Link className="text-mosque font-medium text-sm border-b-2 border-mosque px-1 py-1" href="/">{t('navbar.buy')}</Link>
+                        <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="#">{t('navbar.rent')}</Link>
+                        <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="#">{t('navbar.sell')}</Link>
+                        <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="#">{t('navbar.saved_homes')}</Link>
                     </div>
-                    <div className="flex items-center space-x-6">
-                        <button className="text-nordic-dark hover:text-mosque transition-colors">
+                    <div className="flex items-center space-x-4 sm:space-x-6">
+                        <button className="text-nordic-dark hover:text-mosque transition-colors" title={t('navbar.search')}>
                             <span className="material-icons">search</span>
                         </button>
-                        <button className="text-nordic-dark hover:text-mosque transition-colors relative">
+                        <button className="text-nordic-dark hover:text-mosque transition-colors relative" title={t('navbar.notifications')}>
                             <span className="material-icons">notifications_none</span>
                             <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-background-light"></span>
                         </button>
-                        <button className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2">
+                        <LanguageSelector />
+                        <button className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2" title={t('navbar.profile')}>
                             <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-mosque transition-all">
                                 <img
                                     alt="Profile"

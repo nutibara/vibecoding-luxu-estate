@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Bed, Bath, Square, Car, Check } from "lucide-react";
 import { supabase, Property, PropertyImage } from "../../../lib/supabase";
 import PropertyMapWrapper from "../../components/PropertyMapWrapper";
+import { getTranslation } from "../../i18n/server";
 
 interface PropertyDetailsProps {
     params: Promise<{ slug: string }>;
@@ -11,6 +11,7 @@ interface PropertyDetailsProps {
 
 export default async function PropertyDetails({ params }: PropertyDetailsProps) {
     const { slug } = await params;
+    const { t } = await getTranslation();
 
     const [propertyResult, imagesResult] = await Promise.all([
         supabase.from("properties").select("*").eq("slug", slug).single(),
@@ -43,7 +44,7 @@ export default async function PropertyDetails({ params }: PropertyDetailsProps) 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 text-nordic-dark hover:text-mosque transition-colors">
                         <ArrowLeft className="w-5 h-5" />
-                        <span className="font-medium text-sm">Back to properties</span>
+                        <span className="font-medium text-sm">{t("property.back")}</span>
                     </Link>
                     <Link href="/" className="text-xl font-bold tracking-tight text-nordic-dark">
                         LUXE<span className="font-light">ESTATE</span>
@@ -72,7 +73,7 @@ export default async function PropertyDetails({ params }: PropertyDetailsProps) 
                                 {formatPrice(property.price)}
                             </p>
                             <p className="text-sm text-nordic-muted uppercase tracking-wider font-semibold">
-                                FOR {property.type}
+                                {property.type === "rent" ? t("property.for_rent") : t("property.for_sale")}
                             </p>
                         </div>
                     </div>
@@ -95,7 +96,7 @@ export default async function PropertyDetails({ params }: PropertyDetailsProps) 
                             <div key={index} className="hidden md:block relative overflow-hidden rounded-2xl h-full">
                                 <img
                                     src={url}
-                                    alt={`Gallery ${index + 1}`}
+                                    alt={`${t("property.gallery_photo")} ${index + 1}`}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
@@ -112,7 +113,7 @@ export default async function PropertyDetails({ params }: PropertyDetailsProps) 
                                 >
                                     <img
                                         src={url}
-                                        alt={`Additional photo ${index + 1}`}
+                                        alt={`${t("property.additional_photo")} ${index + 1}`}
                                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                     />
                                 </div>
@@ -133,7 +134,7 @@ export default async function PropertyDetails({ params }: PropertyDetailsProps) 
                                     <Bed className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="text-xs text-nordic-muted uppercase tracking-wider">Bedrooms</p>
+                                    <p className="text-xs text-nordic-muted uppercase tracking-wider">{t("property.bedrooms")}</p>
                                     <p className="font-semibold text-nordic-dark">{property.beds}</p>
                                 </div>
                             </div>
@@ -143,7 +144,7 @@ export default async function PropertyDetails({ params }: PropertyDetailsProps) 
                                     <Bath className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="text-xs text-nordic-muted uppercase tracking-wider">Bathrooms</p>
+                                    <p className="text-xs text-nordic-muted uppercase tracking-wider">{t("property.bathrooms")}</p>
                                     <p className="font-semibold text-nordic-dark">{property.baths}</p>
                                 </div>
                             </div>
@@ -153,7 +154,7 @@ export default async function PropertyDetails({ params }: PropertyDetailsProps) 
                                     <Square className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="text-xs text-nordic-muted uppercase tracking-wider">Area</p>
+                                    <p className="text-xs text-nordic-muted uppercase tracking-wider">{t("property.area")}</p>
                                     <p className="font-semibold text-nordic-dark">{property.sqft} sqft</p>
                                 </div>
                             </div>
@@ -164,7 +165,7 @@ export default async function PropertyDetails({ params }: PropertyDetailsProps) 
                                         <Car className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <p className="text-xs text-nordic-muted uppercase tracking-wider">Garage</p>
+                                        <p className="text-xs text-nordic-muted uppercase tracking-wider">{t("property.garage")}</p>
                                         <p className="font-semibold text-nordic-dark">{property.garage}</p>
                                     </div>
                                 </div>
@@ -173,16 +174,16 @@ export default async function PropertyDetails({ params }: PropertyDetailsProps) 
 
                         {/* Description */}
                         <section>
-                            <h2 className="text-2xl font-light text-nordic-dark mb-4">About the Property</h2>
+                            <h2 className="text-2xl font-light text-nordic-dark mb-4">{t("property.about")}</h2>
                             <div className="prose prose-lg text-nordic-muted leading-relaxed">
-                                <p>{property.description || "No description available for this property."}</p>
+                                <p>{property.description || t("property.no_description")}</p>
                             </div>
                         </section>
 
                         {/* Amenities */}
                         {property.amenities && property.amenities.length > 0 && (
                             <section>
-                                <h2 className="text-2xl font-light text-nordic-dark mb-6">Amenities</h2>
+                                <h2 className="text-2xl font-light text-nordic-dark mb-6">{t("property.amenities")}</h2>
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-8">
                                     {property.amenities.map((amenity, idx) => (
                                         <div key={idx} className="flex items-center gap-3 text-nordic-dark">
@@ -198,7 +199,7 @@ export default async function PropertyDetails({ params }: PropertyDetailsProps) 
 
                         {/* Location Map */}
                         <section>
-                            <h2 className="text-2xl font-light text-nordic-dark mb-6">Location</h2>
+                            <h2 className="text-2xl font-light text-nordic-dark mb-6">{t("property.location")}</h2>
                             {property.latitude && property.longitude ? (
                                 <div className="shadow-lg shadow-nordic-dark/5 rounded-xl overflow-hidden">
                                     <PropertyMapWrapper
@@ -209,7 +210,7 @@ export default async function PropertyDetails({ params }: PropertyDetailsProps) 
                                 </div>
                             ) : (
                                 <div className="p-8 bg-nordic-dark/5 rounded-xl text-center text-nordic-muted">
-                                    Map coordinates not available for this property.
+                                    {t("property.map_unavailable")}
                                 </div>
                             )}
                         </section>
@@ -219,12 +220,12 @@ export default async function PropertyDetails({ params }: PropertyDetailsProps) 
                     {/* Right Column: Agent Card */}
                     <div className="lg:col-span-1">
                         <div className="sticky top-24 bg-white p-8 rounded-2xl shadow-card border border-nordic-dark/5">
-                            <h3 className="text-lg font-medium text-nordic-dark mb-6">Contact Agent</h3>
+                            <h3 className="text-lg font-medium text-nordic-dark mb-6">{t("property.contact_agent")}</h3>
 
                             <div className="flex items-center gap-4 mb-6">
                                 <div className="w-16 h-16 rounded-full overflow-hidden bg-nordic-dark/10">
                                     {property.agent_image ? (
-                                        <img src={property.agent_image} alt={property.agent_name || "Agent"} className="w-full h-full object-cover" />
+                                        <img src={property.agent_image} alt={property.agent_name || t("property.default_agent")} className="w-full h-full object-cover" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-mosque">
                                             <span className="material-icons text-3xl">person</span>
@@ -232,27 +233,27 @@ export default async function PropertyDetails({ params }: PropertyDetailsProps) 
                                     )}
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-nordic-dark text-lg">{property.agent_name || "Luxe Estate Agent"}</p>
-                                    <p className="text-sm text-mosque font-medium">Verified Agent</p>
+                                    <p className="font-semibold text-nordic-dark text-lg">{property.agent_name || t("property.default_agent")}</p>
+                                    <p className="text-sm text-mosque font-medium">{t("property.verified_agent")}</p>
                                 </div>
                             </div>
 
                             <form className="space-y-4">
                                 <div>
-                                    <input type="text" placeholder="Your Name" className="w-full px-4 py-3 rounded-lg bg-nordic-light/50 border border-nordic-dark/10 focus:border-mosque focus:ring-1 focus:ring-mosque outline-none transition-all placeholder:text-nordic-muted/60" />
+                                    <input type="text" placeholder={t("property.name_placeholder")} className="w-full px-4 py-3 rounded-lg bg-nordic-light/50 border border-nordic-dark/10 focus:border-mosque focus:ring-1 focus:ring-mosque outline-none transition-all placeholder:text-nordic-muted/60" />
                                 </div>
                                 <div>
-                                    <input type="email" placeholder="Email Address" className="w-full px-4 py-3 rounded-lg bg-nordic-light/50 border border-nordic-dark/10 focus:border-mosque focus:ring-1 focus:ring-mosque outline-none transition-all placeholder:text-nordic-muted/60" />
+                                    <input type="email" placeholder={t("property.email_placeholder")} className="w-full px-4 py-3 rounded-lg bg-nordic-light/50 border border-nordic-dark/10 focus:border-mosque focus:ring-1 focus:ring-mosque outline-none transition-all placeholder:text-nordic-muted/60" />
                                 </div>
                                 <div>
-                                    <textarea rows={4} placeholder="I'm interested in this property..." className="w-full px-4 py-3 rounded-lg bg-nordic-light/50 border border-nordic-dark/10 focus:border-mosque focus:ring-1 focus:ring-mosque outline-none transition-all resize-none placeholder:text-nordic-muted/60"></textarea>
+                                    <textarea rows={4} placeholder={t("property.message_placeholder")} className="w-full px-4 py-3 rounded-lg bg-nordic-light/50 border border-nordic-dark/10 focus:border-mosque focus:ring-1 focus:ring-mosque outline-none transition-all resize-none placeholder:text-nordic-muted/60"></textarea>
                                 </div>
                                 <button type="button" className="w-full py-4 bg-mosque hover:bg-mosque/90 text-white font-medium rounded-lg transition-colors shadow-lg shadow-mosque/20">
-                                    Send Message
+                                    {t("property.send_message")}
                                 </button>
                                 <button type="button" className="w-full py-4 bg-white border border-nordic-dark/10 hover:border-mosque text-nordic-dark font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
                                     <span className="material-icons text-mosque text-[18px]">phone</span>
-                                    Call Agent
+                                    {t("property.call_agent")}
                                 </button>
                             </form>
                         </div>

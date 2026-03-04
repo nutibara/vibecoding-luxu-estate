@@ -3,9 +3,10 @@ import Link from "next/link";
 interface PaginationProps {
     currentPage: number;
     totalPages: number;
+    t: (key: string) => string;
 }
 
-export default function Pagination({ currentPage, totalPages }: PaginationProps) {
+export default function Pagination({ currentPage, totalPages, t }: PaginationProps) {
     if (totalPages <= 1) return null;
 
     const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -19,12 +20,12 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
                     className="flex items-center gap-1 px-4 py-2 rounded-lg bg-white border border-nordic-dark/10 text-nordic-dark hover:border-mosque hover:text-mosque font-medium text-sm transition-all hover:shadow-md"
                 >
                     <span className="material-icons text-base">arrow_back</span>
-                    Prev
+                    {t("pagination.prev")}
                 </Link>
             ) : (
                 <span className="flex items-center gap-1 px-4 py-2 rounded-lg bg-white border border-nordic-dark/5 text-nordic-muted font-medium text-sm cursor-not-allowed opacity-50">
                     <span className="material-icons text-base">arrow_back</span>
-                    Prev
+                    {t("pagination.prev")}
                 </span>
             )}
 
@@ -35,8 +36,8 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
                         key={page}
                         href={`?page=${page}`}
                         className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-all ${page === currentPage
-                                ? "bg-nordic-dark text-white shadow-sm"
-                                : "bg-white border border-nordic-dark/10 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 hover:bg-mosque/5"
+                            ? "bg-nordic-dark text-white shadow-sm"
+                            : "bg-white border border-nordic-dark/10 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 hover:bg-mosque/5"
                             }`}
                     >
                         {page}
@@ -50,12 +51,12 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
                     href={`?page=${currentPage + 1}`}
                     className="flex items-center gap-1 px-4 py-2 rounded-lg bg-white border border-nordic-dark/10 text-nordic-dark hover:border-mosque hover:text-mosque font-medium text-sm transition-all hover:shadow-md"
                 >
-                    Next
+                    {t("pagination.next")}
                     <span className="material-icons text-base">arrow_forward</span>
                 </Link>
             ) : (
                 <span className="flex items-center gap-1 px-4 py-2 rounded-lg bg-white border border-nordic-dark/5 text-nordic-muted font-medium text-sm cursor-not-allowed opacity-50">
-                    Next
+                    {t("pagination.next")}
                     <span className="material-icons text-base">arrow_forward</span>
                 </span>
             )}

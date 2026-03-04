@@ -3,6 +3,7 @@ import { supabase, Property } from "../lib/supabase";
 import Pagination from "./components/Pagination";
 import FeaturedCollection from "./components/FeaturedCollection";
 import HeroSearch from "./components/HeroSearch";
+import { getTranslation } from "./i18n/server";
 
 const PAGE_SIZE = 8;
 
@@ -20,6 +21,7 @@ interface HomeProps {
 }
 
 export default async function Home({ searchParams }: HomeProps) {
+  const { t } = await getTranslation();
   const params = await searchParams;
   const currentPage = Math.max(1, parseInt(params.page ?? "1", 10));
   const offset = (currentPage - 1) * PAGE_SIZE;
@@ -36,7 +38,6 @@ export default async function Home({ searchParams }: HomeProps) {
   if (params.minPrice) query = query.gte("price", parseInt(params.minPrice, 10));
   if (params.maxPrice) query = query.lte("price", parseInt(params.maxPrice, 10));
   if (params.type && params.type !== "Any Type") {
-    // Match property type against title since we only have "sale" or "rent" in the type column
     query = query.ilike("title", `%${params.type}%`);
   }
   if (params.beds) query = query.gte("beds", parseInt(params.beds, 10));
@@ -63,6 +64,7 @@ export default async function Home({ searchParams }: HomeProps) {
       currency: "USD",
       maximumFractionDigits: 0,
     }).format(price);
+
   const initialFilters = {
     minPrice: params.minPrice || "",
     maxPrice: params.maxPrice || "",
@@ -80,24 +82,28 @@ export default async function Home({ searchParams }: HomeProps) {
       <HeroSearch initialQ={params.q || ""} initialFilters={initialFilters} />
 
       {/* Featured Collections */}
-      {!isFiltering && <FeaturedCollection properties={featuredProperties} />}
+      {!isFiltering && <FeaturedCollection properties={featuredProperties} t={t} />}
 
       {/* New in Market — paginated */}
       <section>
         <div className="flex items-end justify-between mb-8">
           <div>
             <h2 className="text-2xl font-light text-nordic-dark">
-              {isFiltering ? "Search Results" : "New in Market"}
+              {isFiltering ? t("listings.search_results_title") : t("listings.title")}
             </h2>
             <p className="text-nordic-muted mt-1 text-sm">
-              {isFiltering ? `Found ${totalCount} matching properties.` : "Fresh opportunities added this week. "}
-              {!isFiltering && <span className="text-mosque font-medium">{totalCount} properties</span>}
+              {isFiltering
+                ? t("listings.search_results_subtitle", { count: totalCount })
+                : t("listings.subtitle")}
+              {!isFiltering && (
+                <span className="text-mosque font-medium"> {t("listings.properties_count", { count: totalCount })}</span>
+              )}
             </p>
           </div>
           <div className="hidden md:flex bg-white p-1 rounded-lg">
-            <button className="px-4 py-1.5 rounded-md text-sm font-medium bg-nordic-dark text-white shadow-sm">All</button>
-            <button className="px-4 py-1.5 rounded-md text-sm font-medium text-nordic-muted hover:text-nordic-dark transition-colors">Buy</button>
-            <button className="px-4 py-1.5 rounded-md text-sm font-medium text-nordic-muted hover:text-nordic-dark transition-colors">Rent</button>
+            <button className="px-4 py-1.5 rounded-md text-sm font-medium bg-nordic-dark text-white shadow-sm">{t("listings.tab_all")}</button>
+            <button className="px-4 py-1.5 rounded-md text-sm font-medium text-nordic-muted hover:text-nordic-dark transition-colors">{t("listings.tab_buy")}</button>
+            <button className="px-4 py-1.5 rounded-md text-sm font-medium text-nordic-muted hover:text-nordic-dark transition-colors">{t("listings.tab_rent")}</button>
           </div>
         </div>
 
@@ -115,14 +121,14 @@ export default async function Home({ searchParams }: HomeProps) {
                     <span className="material-icons text-lg">favorite_border</span>
                   </button>
                   <div className={`absolute bottom-3 left-3 text-white text-xs font-bold px-2 py-1 rounded ${property.type === "rent" ? "bg-mosque/90" : "bg-nordic-dark/90"}`}>
-                    FOR {property.type.toUpperCase()}
+                    {property.type === "rent" ? t("listings.for_rent") : t("listings.for_sale")}
                   </div>
                 </div>
                 <div className="p-4 flex flex-col flex-grow">
                   <div className="flex justify-between items-baseline mb-2">
                     <h3 className="font-bold text-lg text-nordic-dark">
                       {formatPrice(property.price)}
-                      {property.type === "rent" && <span className="text-sm font-normal text-nordic-muted">/mo</span>}
+                      {property.type === "rent" && <span className="text-sm font-normal text-nordic-muted">{t("listings.per_month")}</span>}
                     </h3>
                   </div>
                   <h4 className="text-nordic-dark font-medium truncate mb-1">{property.title}</h4>
@@ -145,7 +151,7 @@ export default async function Home({ searchParams }: HomeProps) {
         </div>
 
         {/* Server-side pagination */}
-        <Pagination currentPage={currentPage} totalPages={totalPages} />
+        <Pagination currentPage={currentPage} totalPages={totalPages} t={t} />
       </section>
     </main>
   );

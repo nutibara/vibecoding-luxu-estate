@@ -3,18 +3,27 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import FiltersModal, { FilterState } from "./FiltersModal";
+import { useLanguage } from "../i18n/LanguageContext";
 
 interface HeroSearchProps {
     initialQ: string;
     initialFilters: FilterState;
 }
 
-const PROPERTY_TYPES = ["All", "House", "Apartment", "Villa", "Penthouse"];
-
 export default function HeroSearch({ initialQ, initialFilters }: HeroSearchProps) {
+    const { t } = useLanguage();
     const router = useRouter();
     const [q, setQ] = useState(initialQ);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const PROPERTY_TYPES = [
+        { key: "All", label: t("hero.type_all") },
+        { key: "House", label: t("hero.type_house") },
+        { key: "Apartment", label: t("hero.type_apartment") },
+        { key: "Villa", label: t("hero.type_villa") },
+        { key: "Penthouse", label: t("hero.type_penthouse") },
+    ];
+
     const [activeType, setActiveType] = useState(() => {
         if (!initialFilters.type || initialFilters.type === "Any Type") return "All";
         return initialFilters.type;
@@ -39,8 +48,6 @@ export default function HeroSearch({ initialQ, initialFilters }: HeroSearchProps
         if (filters.beds) params.set("beds", filters.beds);
         if (filters.baths) params.set("baths", filters.baths);
         if (filters.amenities.length > 0) params.set("amenities", filters.amenities.join(","));
-
-        // Reset pagination to page 1 on search
         router.push(`/?${params.toString()}`);
     };
 
@@ -53,21 +60,21 @@ export default function HeroSearch({ initialQ, initialFilters }: HeroSearchProps
         applyFiltersToUrl(q, filters);
     };
 
-    const handleTypeClick = (type: string) => {
-        setActiveType(type);
-        applyFiltersToUrl(q, { ...initialFilters, type: type === "All" ? "Any Type" : type });
+    const handleTypeClick = (typeKey: string) => {
+        setActiveType(typeKey);
+        applyFiltersToUrl(q, { ...initialFilters, type: typeKey === "All" ? "Any Type" : typeKey });
     };
 
     return (
         <section className="py-12 md:py-16">
             <div className="max-w-3xl mx-auto text-center space-y-8">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-light text-nordic-dark leading-tight">
-                    Find your{" "}
+                    {t("hero.title_start")}{" "}
                     <span className="relative inline-block">
-                        <span className="relative z-10 font-medium">sanctuary</span>
+                        <span className="relative z-10 font-medium">{t("hero.title_highlight")}</span>
                         <span className="absolute bottom-2 left-0 w-full h-3 bg-mosque/20 -rotate-1 z-0"></span>
                     </span>
-                    .
+                    {t("hero.title_end")}
                 </h1>
                 <div className="relative group max-w-2xl mx-auto">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -75,7 +82,7 @@ export default function HeroSearch({ initialQ, initialFilters }: HeroSearchProps
                     </div>
                     <input
                         className="block w-full pl-12 pr-4 py-4 rounded-xl border-none bg-white text-nordic-dark shadow-soft placeholder-nordic-muted/60 focus:ring-2 focus:ring-mosque focus:bg-white transition-all text-lg focus:outline-none"
-                        placeholder="Search by city, neighborhood, or address..."
+                        placeholder={t("hero.search_placeholder")}
                         type="text"
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
@@ -85,23 +92,23 @@ export default function HeroSearch({ initialQ, initialFilters }: HeroSearchProps
                         className="absolute inset-y-2 right-2 px-6 bg-mosque hover:bg-mosque/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center shadow-lg shadow-mosque/20"
                         onClick={handleSearch}
                     >
-                        Search
+                        {t("hero.search_button")}
                     </button>
                 </div>
 
                 <div className="flex items-center justify-center gap-3 overflow-x-auto hide-scroll py-2 px-4 -mx-4">
                     {PROPERTY_TYPES.map((type) => {
-                        const isActive = activeType === type;
+                        const isActive = activeType === type.key;
                         return (
                             <button
-                                key={type}
-                                onClick={() => handleTypeClick(type)}
+                                key={type.key}
+                                onClick={() => handleTypeClick(type.key)}
                                 className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium transition-all ${isActive
-                                        ? "bg-nordic-dark text-white shadow-lg shadow-nordic-dark/10 hover:-translate-y-0.5"
-                                        : "bg-white border border-nordic-dark/5 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 hover:bg-mosque/5"
+                                    ? "bg-nordic-dark text-white shadow-lg shadow-nordic-dark/10 hover:-translate-y-0.5"
+                                    : "bg-white border border-nordic-dark/5 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 hover:bg-mosque/5"
                                     }`}
                             >
-                                {type}
+                                {type.label}
                             </button>
                         );
                     })}
@@ -112,7 +119,7 @@ export default function HeroSearch({ initialQ, initialFilters }: HeroSearchProps
                         className="whitespace-nowrap flex items-center gap-1 px-4 py-2 rounded-full text-nordic-dark font-medium text-sm hover:bg-black/5 transition-colors"
                         onClick={() => setIsModalOpen(true)}
                     >
-                        <span className="material-icons text-base">tune</span> Filters
+                        <span className="material-icons text-base">tune</span> {t("hero.filters_button")}
                     </button>
                 </div>
             </div>

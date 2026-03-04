@@ -3,9 +3,10 @@ import { Property } from "../../lib/supabase";
 
 interface Props {
     properties: Property[];
+    t: (key: string, vars?: Record<string, string | number>) => string;
 }
 
-export default function FeaturedCollection({ properties }: Props) {
+export default function FeaturedCollection({ properties, t }: Props) {
     const formatPrice = (price: number) =>
         new Intl.NumberFormat("en-US", {
             style: "currency",
@@ -19,11 +20,11 @@ export default function FeaturedCollection({ properties }: Props) {
         <section className="mb-16">
             <div className="flex items-end justify-between mb-8">
                 <div>
-                    <h2 className="text-2xl font-light text-nordic-dark">Featured Collections</h2>
-                    <p className="text-nordic-muted mt-1 text-sm">Curated properties for the discerning eye.</p>
+                    <h2 className="text-2xl font-light text-nordic-dark">{t("featured.title")}</h2>
+                    <p className="text-nordic-muted mt-1 text-sm">{t("featured.subtitle")}</p>
                 </div>
                 <a className="hidden sm:flex items-center gap-1 text-sm font-medium text-mosque hover:opacity-70 transition-opacity" href="#">
-                    View all <span className="material-icons text-sm">arrow_forward</span>
+                    {t("featured.view_all")} <span className="material-icons text-sm">arrow_forward</span>
                 </a>
             </div>
 
@@ -38,7 +39,7 @@ export default function FeaturedCollection({ properties }: Props) {
                                     src={property.image}
                                 />
                                 <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-nordic-dark">
-                                    {property.is_new ? "NEW ARRIVAL" : "FEATURED"}
+                                    {property.is_new ? t("featured.new_arrival") : t("featured.featured_badge")}
                                 </div>
                                 <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-nordic-dark hover:bg-mosque hover:text-white transition-all">
                                     <span className="material-icons text-xl">favorite_border</span>
@@ -55,15 +56,15 @@ export default function FeaturedCollection({ properties }: Props) {
                                     </div>
                                     <div className="flex flex-col items-end">
                                         <span className="text-xl font-semibold text-mosque">{formatPrice(property.price)}</span>
-                                        {property.type === "rent" && <span className="text-sm font-normal text-nordic-muted leading-none">/month</span>}
+                                        {property.type === "rent" && <span className="text-sm font-normal text-nordic-muted leading-none">{t("featured.per_month")}</span>}
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-6 mt-6 pt-6 border-t border-nordic-dark/5">
                                     <div className="flex items-center gap-2 text-nordic-muted text-sm">
-                                        <span className="material-icons text-lg">king_bed</span> {property.beds} Beds
+                                        <span className="material-icons text-lg">king_bed</span> {property.beds} {t("featured.beds")}
                                     </div>
                                     <div className="flex items-center gap-2 text-nordic-muted text-sm">
-                                        <span className="material-icons text-lg">bathtub</span> {property.baths} Baths
+                                        <span className="material-icons text-lg">bathtub</span> {property.baths} {t("featured.baths")}
                                     </div>
                                     <div className="flex items-center gap-2 text-nordic-muted text-sm">
                                         <span className="material-icons text-lg">square_foot</span> {new Intl.NumberFormat().format(property.sqft)} sqft

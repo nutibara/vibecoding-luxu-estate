@@ -48,7 +48,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
   const [propertiesResult, featuredResult] = await Promise.all([
     query,
-    supabase.from("properties").select("*").eq("is_featured", true).order("created_at", { ascending: true }),
+    supabase.from("properties").select("*").eq("is_featured", true).order("created_at", { ascending: true }).limit(2),
   ]);
 
   const properties: Property[] = propertiesResult.data ?? [];

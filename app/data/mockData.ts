@@ -230,7 +230,7 @@ export const newInMarket: Property[] = [
     location: '40 Thames St, London',
     price: 4800,
     image:
-      'https://images.unsplash.com/photo-1502672260266-1c15293036e3?w=500&q=80',
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500&q=80',
     beds: 2,
     baths: 2,
     sqft: 110,
@@ -376,7 +376,7 @@ export const newInMarket: Property[] = [
     title: 'Luxury Pied-à-Terre',
     location: '15 Rive Gauche, Paris',
     price: 8500,
-    image: 'https://images.unsplash.com/photo-1502672260266-1c15293036e3?w=500&q=80',
+    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500&q=80',
     beds: 2,
     baths: 2,
     sqft: 130,

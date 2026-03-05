@@ -34,6 +34,7 @@ type PropertyFormData = {
     amenities: string[];
     is_featured: boolean;
     is_new: boolean;
+    is_active: boolean;
     latitude: string;
     longitude: string;
 };
@@ -75,6 +76,7 @@ export default function PropertyForm({ initialData, initialImages = [] }: Proper
         amenities: initialData?.amenities || [],
         is_featured: initialData?.is_featured || false,
         is_new: initialData?.is_new || false,
+        is_active: initialData?.is_active !== undefined ? initialData.is_active : true,
         latitude: initialData?.latitude?.toString() || '',
         longitude: initialData?.longitude?.toString() || '',
     });
@@ -167,6 +169,7 @@ export default function PropertyForm({ initialData, initialImages = [] }: Proper
                 property_type: formData.property_type,
                 is_new: formData.is_new,
                 is_featured: formData.is_featured,
+                is_active: formData.is_active,
                 description: formData.description,
                 garage: formData.garage,
                 amenities: formData.amenities,
@@ -393,7 +396,7 @@ export default function PropertyForm({ initialData, initialImages = [] }: Proper
                                 </div>
                             </div>
 
-                            <div className="flex gap-6 mt-4 pt-4 border-t border-gray-100">
+                            <div className="flex flex-wrap gap-6 mt-4 pt-4 border-t border-gray-100">
                                 <label className="flex items-center gap-2.5 cursor-pointer">
                                     <input
                                         type="checkbox"
@@ -411,6 +414,15 @@ export default function PropertyForm({ initialData, initialImages = [] }: Proper
                                         onChange={(e) => setFormData(p => ({ ...p, is_featured: e.target.checked }))}
                                     />
                                     <span className="text-sm font-medium">Featured Property</span>
+                                </label>
+                                <label className="flex items-center gap-2.5 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        className="w-4 h-4 text-[#006655] border-gray-300 rounded focus:ring-[#006655]"
+                                        checked={formData.is_active}
+                                        onChange={(e) => setFormData(p => ({ ...p, is_active: e.target.checked }))}
+                                    />
+                                    <span className="text-sm font-medium">Active Listing <span className="text-gray-400 font-normal">(visible on site)</span></span>
                                 </label>
                             </div>
                         </div>

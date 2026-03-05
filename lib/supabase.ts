@@ -18,6 +18,7 @@ export interface Property {
     type: "sale" | "rent";
     is_new: boolean;
     is_featured?: boolean;
+    is_active?: boolean;
     description?: string;
     garage?: number;
     amenities?: string[];

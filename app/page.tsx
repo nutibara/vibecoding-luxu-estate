@@ -29,6 +29,7 @@ export default async function Home({ searchParams }: HomeProps) {
   let query = supabase
     .from("properties")
     .select("*", { count: "exact" })
+    .eq("is_active", true)
     .order("created_at", { ascending: false })
     .range(offset, offset + PAGE_SIZE - 1);
 
@@ -49,7 +50,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
   const [propertiesResult, featuredResult] = await Promise.all([
     query,
-    supabase.from("properties").select("*").eq("is_featured", true).order("created_at", { ascending: true }).limit(2),
+    supabase.from("properties").select("*").eq("is_featured", true).eq("is_active", true).order("created_at", { ascending: true }).limit(2),
   ]);
 
   const properties: Property[] = propertiesResult.data ?? [];

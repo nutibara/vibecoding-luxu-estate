@@ -1,5 +1,11 @@
 import { createClient } from '@/utils/supabase/server';
 import Link from 'next/link';
+import { togglePropertyActive } from './actions';
+
+async function deactivate(id: string, isActive: boolean) {
+    'use server';
+    await togglePropertyActive(id, isActive);
+}
 
 export default async function AdminPropertiesPage(props: {
     searchParams: Promise<{ page?: string }>;
@@ -11,12 +17,17 @@ export default async function AdminPropertiesPage(props: {
     const start = (page - 1) * limit;
     const end = start + limit - 1;
 
-    // Get total count
+    // Get total count and active count
     const { count, error: countError } = await supabase
         .from('properties')
         .select('*', { count: 'exact', head: true });
 
-    // Fetch paginated data
+    const { count: activeCount } = await supabase
+        .from('properties')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true);
+
+    // Fetch paginated data (all properties, including inactive)
     const { data: properties, error } = await supabase
         .from('properties')
         .select('*')
@@ -62,7 +73,7 @@ export default async function AdminPropertiesPage(props: {
                 <div className="bg-white p-5 rounded-xl border border-[#006655]/10 shadow-sm flex items-center justify-between">
                     <div>
                         <p className="text-sm font-medium text-gray-500">Active Properties</p>
-                        <p className="text-2xl font-bold text-[#19322F] mt-1">{totalCount}</p>
+                        <p className="text-2xl font-bold text-[#19322F] mt-1">{activeCount ?? 0}</p>
                     </div>
                     <div className="h-10 w-10 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
                         <span className="material-icons">check_circle</span>
@@ -70,11 +81,11 @@ export default async function AdminPropertiesPage(props: {
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-[#006655]/10 shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-sm font-medium text-gray-500">Pending Sale</p>
-                        <p className="text-2xl font-bold text-[#19322F] mt-1">0</p>
+                        <p className="text-sm font-medium text-gray-500">Inactive Properties</p>
+                        <p className="text-2xl font-bold text-[#19322F] mt-1">{totalCount - (activeCount ?? 0)}</p>
                     </div>
                     <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
-                        <span className="material-icons">pending</span>
+                        <span className="material-icons">visibility_off</span>
                     </div>
                 </div>
             </div>
@@ -88,10 +99,15 @@ export default async function AdminPropertiesPage(props: {
                 </div>
 
                 {properties?.map(prop => (
-                    <div key={prop.id} className="group grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-5 border-b border-gray-100 hover:bg-[#EEF6F6] transition-colors items-center">
+                    <div key={prop.id} className={`group grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-5 border-b border-gray-100 hover:bg-[#EEF6F6] transition-colors items-center ${!prop.is_active ? 'opacity-60' : ''}`}>
                         <div className="col-span-12 md:col-span-6 flex gap-4 items-center">
                             <div className="relative h-20 w-28 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200">
                                 <img alt={prop.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" src={prop.image || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa'} />
+                                {!prop.is_active && (
+                                    <div className="absolute inset-0 bg-gray-900/40 flex items-center justify-center">
+                                        <span className="material-icons text-white text-xl">visibility_off</span>
+                                    </div>
+                                )}
                             </div>
                             <div>
                                 <h3 className="text-lg font-bold text-[#19322F] group-hover:text-[#006655] transition-colors cursor-pointer">{prop.title}</h3>
@@ -112,19 +128,35 @@ export default async function AdminPropertiesPage(props: {
                         </div>
 
                         <div className="col-span-6 md:col-span-2">
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#D9ECC8] text-[#006655] border border-[#006655]/10">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#006655] mr-1.5"></span>
-                                Active
-                            </span>
+                            {prop.is_active ? (
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#D9ECC8] text-[#006655] border border-[#006655]/10">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#006655] mr-1.5"></span>
+                                    Active
+                                </span>
+                            ) : (
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-100">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>
+                                    Inactive
+                                </span>
+                            )}
                         </div>
 
                         <div className="col-span-12 md:col-span-2 flex items-center justify-end gap-2">
                             <Link href={`/admin/properties/${prop.id}`} className="p-2 rounded-lg text-gray-400 hover:text-[#006655] hover:bg-[#D9ECC8]/30 transition-all tooltip-trigger" title="Edit Property">
                                 <span className="material-icons text-xl">edit</span>
                             </Link>
-                            <button className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all tooltip-trigger" title="Delete Property">
-                                <span className="material-icons text-xl">delete_outline</span>
-                            </button>
+                            <form action={deactivate.bind(null, prop.id, !prop.is_active)}>
+                                <button
+                                    type="submit"
+                                    title={prop.is_active ? 'Deactivate Property' : 'Activate Property'}
+                                    className={`p-2 rounded-lg transition-all tooltip-trigger ${prop.is_active
+                                        ? 'text-gray-400 hover:text-orange-600 hover:bg-orange-50'
+                                        : 'text-gray-400 hover:text-[#006655] hover:bg-[#D9ECC8]/30'
+                                        }`}
+                                >
+                                    <span className="material-icons text-xl">{prop.is_active ? 'visibility_off' : 'visibility'}</span>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 ))}

@@ -3,9 +3,31 @@
 import Link from "next/link";
 import { useLanguage } from "../i18n/LanguageContext";
 import LanguageSelector from "./LanguageSelector";
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 export default function Navbar() {
     const { t } = useLanguage();
+    const [user, setUser] = useState<User | null>(null);
+    const supabase = createClient();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+
+        fetchUser();
+
+        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => {
+            authListener?.subscription.unsubscribe();
+        };
+    }, [supabase]);
 
     return (
         <nav className="sticky top-0 z-50 bg-background-light/95 backdrop-blur-md border-b border-nordic-dark/10">
@@ -34,15 +56,27 @@ export default function Navbar() {
                             <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-background-light"></span>
                         </button>
                         <LanguageSelector />
-                        <button className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2" title={t('navbar.profile')}>
-                            <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-mosque transition-all">
-                                <img
-                                    alt="Profile"
-                                    className="w-full h-full object-cover"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAWhQZ663Bd08kmzjbOPmUk4UIxYooNONShMEFXLR-DtmVi6Oz-TiaY77SPwFk7g0OobkeZEOMvt6v29mSOD0Xm2g95WbBG3ZjWXmiABOUwGU0LOySRfVDo-JTXQ0-gtwjWxbmue0qDm91m-zEOEZwAW6iRFB1qC1bAU-wkjxm67Sbztq8w7srHkFT9bVEC86qG-FzhOBTomhAurNRmx9l8Yfqabk328NfdKuVLckgCdaPsNFE3yN65MeoRi05GA_gXIMwG4YDIeA"
-                                />
-                            </div>
-                        </button>
+                        {user ? (
+                            <button
+                                onClick={async () => await supabase.auth.signOut()}
+                                className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2 group"
+                                title="Sign Out"
+                            >
+                                <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden ring-2 ring-transparent group-hover:ring-mosque transition-all">
+                                    <img
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
+                                        src={user.user_metadata?.avatar_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuCAWhQZ663Bd08kmzjbOPmUk4UIxYooNONShMEFXLR-DtmVi6Oz-TiaY77SPwFk7g0OobkeZEOMvt6v29mSOD0Xm2g95WbBG3ZjWXmiABOUwGU0LOySRfVDo-JTXQ0-gtwjWxbmue0qDm91m-zEOEZwAW6iRFB1qC1bAU-wkjxm67Sbztq8w7srHkFT9bVEC86qG-FzhOBTomhAurNRmx9l8Yfqabk328NfdKuVLckgCdaPsNFE3yN65MeoRi05GA_gXIMwG4YDIeA"}
+                                    />
+                                </div>
+                            </button>
+                        ) : (
+                            <Link href="/login" className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2" title="Log In">
+                                <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-mosque transition-all flex items-center justify-center">
+                                    <span className="material-icons text-nordic-dark/50 text-xl">person</span>
+                                </div>
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>

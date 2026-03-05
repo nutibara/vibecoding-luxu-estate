@@ -6,7 +6,9 @@
         "saved_homes": "Saved Homes",
         "search": "Search",
         "notifications": "Notifications",
-        "profile": "Profile"
+        "profile": "Profile",
+        "login": "Log In",
+        "logout": "Sign Out"
     },
     "hero": {
         "title_start": "Find your",

@@ -6,7 +6,9 @@
         "saved_homes": "Sauvegardés",
         "search": "Chercher",
         "notifications": "Notifications",
-        "profile": "Profil"
+        "profile": "Profil",
+        "login": "Connexion",
+        "logout": "Déconnexion"
     },
     "hero": {
         "title_start": "Trouvez votre",

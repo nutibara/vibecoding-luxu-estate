@@ -6,7 +6,9 @@
         "saved_homes": "Guardados",
         "search": "Buscar",
         "notifications": "Notificaciones",
-        "profile": "Perfil"
+        "profile": "Perfil",
+        "login": "Iniciar sesión",
+        "logout": "Cerrar sesión"
     },
     "hero": {
         "title_start": "Encuentra tu",

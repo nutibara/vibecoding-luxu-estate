@@ -57,25 +57,33 @@ export default function Navbar() {
                         </button>
                         <LanguageSelector />
                         {user ? (
-                            <button
-                                onClick={async () => await supabase.auth.signOut()}
-                                className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2 group"
-                                title="Sign Out"
-                            >
-                                <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden ring-2 ring-transparent group-hover:ring-mosque transition-all">
+                            <div className="flex items-center gap-3 pl-2 border-l border-nordic-dark/10 ml-2">
+                                <button
+                                    onClick={async () => {
+                                        await supabase.auth.signOut();
+                                        window.location.reload();
+                                    }}
+                                    className="text-sm font-medium text-nordic-dark/70 hover:text-red-600 transition-colors px-2 py-1"
+                                >
+                                    {t('navbar.logout')}
+                                </button>
+                                <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden ring-2 ring-transparent transition-all" title={t('navbar.profile')}>
                                     <img
-                                        alt="Profile"
+                                        alt={t('navbar.profile')}
                                         className="w-full h-full object-cover"
                                         src={user.user_metadata?.avatar_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuCAWhQZ663Bd08kmzjbOPmUk4UIxYooNONShMEFXLR-DtmVi6Oz-TiaY77SPwFk7g0OobkeZEOMvt6v29mSOD0Xm2g95WbBG3ZjWXmiABOUwGU0LOySRfVDo-JTXQ0-gtwjWxbmue0qDm91m-zEOEZwAW6iRFB1qC1bAU-wkjxm67Sbztq8w7srHkFT9bVEC86qG-FzhOBTomhAurNRmx9l8Yfqabk328NfdKuVLckgCdaPsNFE3yN65MeoRi05GA_gXIMwG4YDIeA"}
                                     />
                                 </div>
-                            </button>
+                            </div>
                         ) : (
-                            <Link href="/login" className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2" title="Log In">
-                                <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-mosque transition-all flex items-center justify-center">
-                                    <span className="material-icons text-nordic-dark/50 text-xl">person</span>
-                                </div>
-                            </Link>
+                            <div className="flex items-center gap-3 pl-2 border-l border-nordic-dark/10 ml-2">
+                                <Link
+                                    href="/login"
+                                    className="text-sm font-medium text-white bg-mosque hover:bg-mosque-dark px-4 py-2 rounded-lg transition-colors shadow-sm"
+                                >
+                                    {t('navbar.login')}
+                                </Link>
+                            </div>
                         )}
                     </div>
                 </div>

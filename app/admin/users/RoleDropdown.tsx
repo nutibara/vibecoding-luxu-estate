@@ -14,21 +14,21 @@ export default function RoleDropdown({ userId, currentRole }: { userId: string, 
     };
 
     return (
-        <div className="relative">
+        <div className="relative w-full md:w-auto">
             <select
                 value={currentRole}
                 onChange={handleChange}
                 disabled={isPending}
-                className="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 outline-none transition-colors appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center pl-4 pr-10 py-2 border border-gray-200 bg-transparent text-xs font-medium rounded-lg text-[#19322F]/70 hover:border-[#19322F] hover:text-[#19322F] focus:outline-none focus:ring-2 focus:ring-[#006655] transition-colors w-full appearance-none cursor-pointer disabled:opacity-50 group-hover:bg-white group-hover:shadow-sm"
             >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
+                <option value="user">User Role</option>
+                <option value="admin">Admin Role</option>
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#19322F]/70">
                 {isPending ? (
-                    <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent flex-shrink-0 animate-spin rounded-full" />
+                    <div className="w-4 h-4 border-2 border-[#006655] border-t-transparent flex-shrink-0 animate-spin rounded-full" />
                 ) : (
-                    <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                    <span className="material-icons text-[16px]">expand_more</span>
                 )}
             </div>
         </div>

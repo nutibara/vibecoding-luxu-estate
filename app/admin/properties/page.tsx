@@ -9,66 +9,116 @@ export default async function AdminPropertiesPage() {
     }
 
     return (
-        <div className="max-w-6xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-[#19322F]">Properties Overview</h1>
-                <button className="bg-[#19322F] text-white px-5 py-2.5 rounded-lg hover:bg-[#2c534f] transition-colors font-medium cursor-not-allowed opacity-50">
-                    Add Property
-                </button>
+        <div className="flex-grow max-w-7xl w-full mx-auto pb-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold text-[#19322F] tracking-tight">My Properties</h1>
+                    <p className="text-gray-500 mt-1 text-sm">Manage your portfolio and track performance.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <button className="bg-white border border-gray-200 text-[#19322F] hover:bg-gray-50 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm inline-flex items-center gap-2">
+                        <span className="material-icons text-base">filter_list</span> Filter
+                    </button>
+                    <button className="bg-[#006655] hover:bg-[#006655]/90 text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md shadow-[#006655]/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center gap-2 cursor-not-allowed">
+                        <span className="material-icons text-base">add</span> Add New Property
+                    </button>
+                </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[600px]">
-                        <thead>
-                            <tr className="bg-gray-50/80 border-b border-gray-100 uppercase text-xs tracking-wider text-gray-500 font-semibold">
-                                <th className="p-5">Property</th>
-                                <th className="p-5">Location</th>
-                                <th className="p-5">Price</th>
-                                <th className="p-5">Type</th>
-                                <th className="p-5 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {properties?.map(prop => (
-                                <tr key={prop.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
-                                    <td className="p-5">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-16 h-12 relative rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
-                                                <img src={prop.image || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa'} alt={prop.title} className="object-cover w-full h-full" />
-                                            </div>
-                                            <div>
-                                                <div className="font-semibold text-[#19322F] text-sm mb-0.5">{prop.title}</div>
-                                                <div className="text-xs text-gray-500 flex items-center gap-1">
-                                                    <span className="material-symbols-outlined text-[14px]">bed</span> {prop.beds}
-                                                    <span className="material-symbols-outlined text-[14px] ml-1">bathtub</span> {prop.baths}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="p-5 text-sm font-medium text-gray-600">{prop.location}</td>
-                                    <td className="p-5 text-sm font-semibold text-[#19322F]">${prop.price.toLocaleString()}</td>
-                                    <td className="p-5">
-                                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full capitalize ${prop.type === 'sale' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-800'}`}>
-                                            {prop.type}
-                                        </span>
-                                    </td>
-                                    <td className="p-5 text-right">
-                                        <button className="text-gray-400 hover:text-emerald-600 font-medium transition-colors p-2 rounded-full hover:bg-emerald-50">
-                                            <span className="material-symbols-outlined text-xl block">edit</span>
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                            {(!properties || properties.length === 0) && (
-                                <tr>
-                                    <td colSpan={5} className="p-8 text-center text-gray-500">
-                                        No properties found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                <div className="bg-white p-5 rounded-xl border border-[#006655]/10 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p className="text-sm font-medium text-gray-500">Total Listings</p>
+                        <p className="text-2xl font-bold text-[#19322F] mt-1">{properties?.length || 0}</p>
+                    </div>
+                    <div className="h-10 w-10 rounded-full bg-[#006655]/10 flex items-center justify-center text-[#006655]">
+                        <span className="material-icons">apartment</span>
+                    </div>
+                </div>
+                <div className="bg-white p-5 rounded-xl border border-[#006655]/10 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p className="text-sm font-medium text-gray-500">Active Properties</p>
+                        <p className="text-2xl font-bold text-[#19322F] mt-1">{properties?.length || 0}</p>
+                    </div>
+                    <div className="h-10 w-10 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
+                        <span className="material-icons">check_circle</span>
+                    </div>
+                </div>
+                <div className="bg-white p-5 rounded-xl border border-[#006655]/10 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p className="text-sm font-medium text-gray-500">Pending Sale</p>
+                        <p className="text-2xl font-bold text-[#19322F] mt-1">0</p>
+                    </div>
+                    <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                        <span className="material-icons">pending</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50/50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <div className="col-span-6">Property Details</div>
+                    <div className="col-span-2">Price</div>
+                    <div className="col-span-2">Status</div>
+                    <div className="col-span-2 text-right">Actions</div>
+                </div>
+
+                {properties?.map(prop => (
+                    <div key={prop.id} className="group grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-5 border-b border-gray-100 hover:bg-[#EEF6F6] transition-colors items-center">
+                        <div className="col-span-12 md:col-span-6 flex gap-4 items-center">
+                            <div className="relative h-20 w-28 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200">
+                                <img alt={prop.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" src={prop.image || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa'} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-[#19322F] group-hover:text-[#006655] transition-colors cursor-pointer">{prop.title}</h3>
+                                <p className="text-sm text-gray-500">{prop.location}</p>
+                                <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-400">
+                                    <span className="flex items-center gap-1"><span className="material-icons text-[14px]">bed</span> {prop.beds} Beds</span>
+                                    <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                                    <span className="flex items-center gap-1"><span className="material-icons text-[14px]">bathtub</span> {prop.baths} Baths</span>
+                                    <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                                    <span>{prop.sqft || 'N/A'} sqft</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="col-span-6 md:col-span-2">
+                            <div className="text-base font-semibold text-[#19322F]">${prop.price.toLocaleString()}</div>
+                            <div className="text-xs text-gray-400 uppercase">{prop.type}</div>
+                        </div>
+
+                        <div className="col-span-6 md:col-span-2">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#D9ECC8] text-[#006655] border border-[#006655]/10">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#006655] mr-1.5"></span>
+                                Active
+                            </span>
+                        </div>
+
+                        <div className="col-span-12 md:col-span-2 flex items-center justify-end gap-2">
+                            <button className="p-2 rounded-lg text-gray-400 hover:text-[#006655] hover:bg-[#D9ECC8]/30 transition-all tooltip-trigger" title="Edit Property">
+                                <span className="material-icons text-xl">edit</span>
+                            </button>
+                            <button className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all tooltip-trigger" title="Delete Property">
+                                <span className="material-icons text-xl">delete_outline</span>
+                            </button>
+                        </div>
+                    </div>
+                ))}
+
+                {(!properties || properties.length === 0) && (
+                    <div className="p-8 text-center text-gray-500">
+                        No properties found.
+                    </div>
+                )}
+
+                <div className="px-6 py-4 flex items-center justify-between bg-gray-50/50">
+                    <div className="text-sm text-gray-500">
+                        Showing <span className="font-medium text-[#19322F]">1</span> to <span className="font-medium text-[#19322F]">{properties?.length || 0}</span> of <span className="font-medium text-[#19322F]">{properties?.length || 0}</span> results
+                    </div>
+                    <div className="flex gap-2">
+                        <button className="px-3 py-1 text-sm border border-gray-200 rounded-md text-gray-600 hover:bg-white disabled:opacity-50" disabled>Previous</button>
+                        <button className="px-3 py-1 text-sm border border-gray-200 rounded-md text-gray-600 hover:bg-white disabled:opacity-50" disabled>Next</button>
+                    </div>
                 </div>
             </div>
         </div>

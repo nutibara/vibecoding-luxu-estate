@@ -3,6 +3,13 @@
 import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import dynamic from 'next/dynamic';
+
+const PropertyMap = dynamic(() => import('./PropertyMap'), {
+    ssr: false,
+    loading: () => <div className="h-[300px] w-full bg-gray-100 animate-pulse rounded-md mt-4 flex items-center justify-center text-gray-400">Loading Map...</div>
+});
+
 
 type PropertyImage = {
     id: string;
@@ -302,7 +309,8 @@ export default function PropertyForm({ initialData, initialImages = [] }: Proper
                         Cancel
                     </button>
                     <button
-                        onClick={handleSubmit}
+                        type="submit"
+                        form="property-form"
                         disabled={isSaving}
                         className="px-5 py-2.5 rounded-lg bg-[#006655] hover:bg-[#19322F] text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm disabled:opacity-50"
                     >
@@ -318,7 +326,7 @@ export default function PropertyForm({ initialData, initialImages = [] }: Proper
                 </div>
             )}
 
-            <form className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start" onSubmit={handleSubmit}>
+            <form id="property-form" className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start" onSubmit={handleSubmit}>
                 <div className="xl:col-span-8 space-y-8">
                     {/* Basic Information */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -543,6 +551,9 @@ export default function PropertyForm({ initialData, initialImages = [] }: Proper
                                     />
                                 </div>
                             </div>
+                            {formData.latitude && formData.longitude && !isNaN(Number(formData.latitude)) && !isNaN(Number(formData.longitude)) && (
+                                <PropertyMap lat={Number(formData.latitude)} lng={Number(formData.longitude)} />
+                            )}
                         </div>
                     </div>
 

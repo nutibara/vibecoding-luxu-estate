@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useLanguage } from "../i18n/LanguageContext";
 import LanguageSelector from "./LanguageSelector";
 import { useEffect, useState } from "react";
@@ -9,6 +10,7 @@ import type { User } from "@supabase/supabase-js";
 
 export default function Navbar() {
     const { t } = useLanguage();
+    const pathname = usePathname();
     const [user, setUser] = useState<User | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const supabase = createClient();
@@ -53,9 +55,9 @@ export default function Navbar() {
                                 <span className="text-lg font-bold tracking-tight text-[#19322F]">LuxeEstate</span>
                             </Link>
                             <div className="hidden md:flex items-center space-x-6">
-                                <Link className="text-gray-400 hover:text-[#19322F] font-medium text-sm transition-colors" href="/admin">Dashboard</Link>
-                                <Link className="text-gray-400 hover:text-[#19322F] font-medium text-sm transition-colors" href="/admin/properties">Properties</Link>
-                                <Link className="text-gray-400 hover:text-[#19322F] font-medium text-sm transition-colors" href="/admin/users">Users</Link>
+                                <Link className={`font-medium text-sm transition-colors ${pathname === '/admin' ? 'text-[#19322F] border-b-2 border-[#19322F] pb-1' : 'text-gray-400 hover:text-[#19322F]'}`} href="/admin">Dashboard</Link>
+                                <Link className={`font-medium text-sm transition-colors ${pathname.startsWith('/admin/properties') ? 'text-[#19322F] border-b-2 border-[#19322F] pb-1' : 'text-gray-400 hover:text-[#19322F]'}`} href="/admin/properties">Properties</Link>
+                                <Link className={`font-medium text-sm transition-colors ${pathname.startsWith('/admin/users') ? 'text-[#19322F] border-b-2 border-[#19322F] pb-1' : 'text-gray-400 hover:text-[#19322F]'}`} href="/admin/users">Users</Link>
                             </div>
                         </div>
                         <div className="flex items-center space-x-6">
@@ -64,17 +66,26 @@ export default function Navbar() {
                                 <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
                             </button>
                             <div className="h-10 w-px bg-gray-200 my-auto hidden sm:block"></div>
-                            <div className="flex items-center gap-3 cursor-pointer group" onClick={async () => {
-                                await supabase.auth.signOut();
-                                window.location.href = "/";
-                            }}>
-                                <div className="flex flex-col items-end hidden sm:flex">
-                                    <span className="text-sm font-semibold text-[#19322F] group-hover:text-[#006655] transition-colors">{user?.email}</span>
-                                    <span className="text-xs text-gray-400">Administrator</span>
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex flex-col items-end hidden sm:flex">
+                                        <span className="text-sm font-semibold text-[#19322F]">{user?.email}</span>
+                                        <span className="text-xs text-gray-400">Administrator</span>
+                                    </div>
+                                    <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300">
+                                        {user?.user_metadata?.avatar_url ? (
+                                            <img src={user.user_metadata.avatar_url} alt="Profile" className="h-full w-full object-cover" />
+                                        ) : (
+                                            <span className="material-icons text-gray-500 text-2xl">person</span>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden transition-all group-hover:ring-2 group-hover:ring-[#006655]">
-                                    <span className="material-icons text-gray-500 text-2xl">person</span>
-                                </div>
+                                <button onClick={async () => {
+                                    await supabase.auth.signOut();
+                                    window.location.href = "/";
+                                }} className="text-gray-400 hover:text-[#006655] transition-colors p-1" title="Log out">
+                                    <span className="material-icons text-xl">logout</span>
+                                </button>
                             </div>
                         </div>
                     </div>

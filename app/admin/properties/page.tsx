@@ -1,11 +1,35 @@
 import { createClient } from '@/utils/supabase/server';
+import Link from 'next/link';
 
-export default async function AdminPropertiesPage() {
+export default async function AdminPropertiesPage(props: {
+    searchParams: Promise<{ page?: string }>;
+}) {
+    const searchParams = await props.searchParams;
     const supabase = await createClient();
-    const { data: properties, error } = await supabase.from('properties').select('*').order('created_at', { ascending: false });
+    const page = parseInt(searchParams?.page || '1');
+    const limit = 10;
+    const start = (page - 1) * limit;
+    const end = start + limit - 1;
 
-    if (error) {
-        return <div className="p-4 bg-red-50 text-red-600 rounded-lg">Error loading properties: {error.message}</div>;
+    // Get total count
+    const { count, error: countError } = await supabase
+        .from('properties')
+        .select('*', { count: 'exact', head: true });
+
+    // Fetch paginated data
+    const { data: properties, error } = await supabase
+        .from('properties')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(start, end);
+
+    const totalCount = count || 0;
+    const totalPages = Math.ceil(totalCount / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    if (error || countError) {
+        return <div className="p-4 bg-red-50 text-red-600 rounded-lg">Error loading properties: {error?.message || countError?.message}</div>;
     }
 
     return (
@@ -19,7 +43,7 @@ export default async function AdminPropertiesPage() {
                     <button className="bg-white border border-gray-200 text-[#19322F] hover:bg-gray-50 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm inline-flex items-center gap-2">
                         <span className="material-icons text-base">filter_list</span> Filter
                     </button>
-                    <button className="bg-[#006655] hover:bg-[#006655]/90 text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md shadow-[#006655]/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center gap-2 cursor-not-allowed">
+                    <button className="bg-[#006655] hover:bg-[#006655]/90 text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md shadow-[#006655]/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center justify-center gap-2 whitespace-nowrap">
                         <span className="material-icons text-base">add</span> Add New Property
                     </button>
                 </div>
@@ -29,7 +53,7 @@ export default async function AdminPropertiesPage() {
                 <div className="bg-white p-5 rounded-xl border border-[#006655]/10 shadow-sm flex items-center justify-between">
                     <div>
                         <p className="text-sm font-medium text-gray-500">Total Listings</p>
-                        <p className="text-2xl font-bold text-[#19322F] mt-1">{properties?.length || 0}</p>
+                        <p className="text-2xl font-bold text-[#19322F] mt-1">{totalCount}</p>
                     </div>
                     <div className="h-10 w-10 rounded-full bg-[#006655]/10 flex items-center justify-center text-[#006655]">
                         <span className="material-icons">apartment</span>
@@ -38,7 +62,7 @@ export default async function AdminPropertiesPage() {
                 <div className="bg-white p-5 rounded-xl border border-[#006655]/10 shadow-sm flex items-center justify-between">
                     <div>
                         <p className="text-sm font-medium text-gray-500">Active Properties</p>
-                        <p className="text-2xl font-bold text-[#19322F] mt-1">{properties?.length || 0}</p>
+                        <p className="text-2xl font-bold text-[#19322F] mt-1">{totalCount}</p>
                     </div>
                     <div className="h-10 w-10 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
                         <span className="material-icons">check_circle</span>
@@ -113,11 +137,19 @@ export default async function AdminPropertiesPage() {
 
                 <div className="px-6 py-4 flex items-center justify-between bg-gray-50/50">
                     <div className="text-sm text-gray-500">
-                        Showing <span className="font-medium text-[#19322F]">1</span> to <span className="font-medium text-[#19322F]">{properties?.length || 0}</span> of <span className="font-medium text-[#19322F]">{properties?.length || 0}</span> results
+                        Showing <span className="font-medium text-[#19322F]">{totalCount === 0 ? 0 : start + 1}</span> to <span className="font-medium text-[#19322F]">{Math.min(end + 1, totalCount)}</span> of <span className="font-medium text-[#19322F]">{totalCount}</span> results
                     </div>
                     <div className="flex gap-2">
-                        <button className="px-3 py-1 text-sm border border-gray-200 rounded-md text-gray-600 hover:bg-white disabled:opacity-50" disabled>Previous</button>
-                        <button className="px-3 py-1 text-sm border border-gray-200 rounded-md text-gray-600 hover:bg-white disabled:opacity-50" disabled>Next</button>
+                        {hasPrevPage ? (
+                            <Link href={`/admin/properties?page=${page - 1}`} className="px-3 py-1 text-sm border border-gray-200 rounded-md text-gray-600 hover:bg-white hover:border-gray-300">Previous</Link>
+                        ) : (
+                            <button className="px-3 py-1 text-sm border border-gray-200 rounded-md text-gray-600 opacity-50 cursor-not-allowed" disabled>Previous</button>
+                        )}
+                        {hasNextPage ? (
+                            <Link href={`/admin/properties?page=${page + 1}`} className="px-3 py-1 text-sm border border-gray-200 rounded-md text-gray-600 hover:bg-white hover:border-gray-300">Next</Link>
+                        ) : (
+                            <button className="px-3 py-1 text-sm border border-gray-200 rounded-md text-gray-600 opacity-50 cursor-not-allowed" disabled>Next</button>
+                        )}
                     </div>
                 </div>
             </div>

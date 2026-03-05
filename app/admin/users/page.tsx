@@ -23,9 +23,8 @@ export default async function AdminUsersPage() {
                         </div>
                         <input className="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg bg-white text-[#19322F] shadow-sm placeholder-[#19322F]/30 focus:ring-2 focus:ring-[#006655] focus:bg-white transition-all text-sm" placeholder="Search by name, email..." type="text" />
                     </div>
-                    <button className="inline-flex items-center justify-center px-4 py-2.5 border border-[#006655] text-sm font-medium rounded-lg text-[#006655] bg-transparent hover:bg-[#006655]/5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#006655] transition-colors whitespace-nowrap">
-                        <span className="material-icons text-lg mr-2">add</span>
-                        Add User
+                    <button className="bg-[#006655] hover:bg-[#006655]/90 text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md shadow-[#006655]/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center justify-center gap-2 whitespace-nowrap">
+                        <span className="material-icons text-base">add</span> Add User
                     </button>
                 </div>
             </header>
